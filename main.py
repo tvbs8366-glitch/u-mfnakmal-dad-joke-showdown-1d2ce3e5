@@ -19,20 +19,25 @@ MAX_CHARS = 200
 OUTPUT_PATH = "/output/entry.txt"
 
 
+def validate_joke(joke: str) -> str | None:
+    """Return an error message if the joke breaks the rules, else None."""
+    if not joke or not joke.strip():
+        return "joke is empty or only whitespace"
+    if "\n" in joke or "\r" in joke:
+        return "joke must be a single line"
+    if len(joke) > MAX_CHARS:
+        return "joke is %d characters, over the %d limit" % (
+            len(joke),
+            MAX_CHARS,
+        )
+    return None
+
+
 def main() -> int:
     # Validate before writing anything.
-    if not JOKE or not JOKE.strip():
-        print("error: joke is empty or only whitespace", file=sys.stderr)
-        return 1
-    if "\n" in JOKE or "\r" in JOKE:
-        print("error: joke must be a single line", file=sys.stderr)
-        return 1
-    if len(JOKE) > MAX_CHARS:
-        print(
-            "error: joke is %d characters, over the %d limit"
-            % (len(JOKE), MAX_CHARS),
-            file=sys.stderr,
-        )
+    error = validate_joke(JOKE)
+    if error is not None:
+        print("error: " + error, file=sys.stderr)
         return 1
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
